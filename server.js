@@ -1,57 +1,39 @@
-const express = require('express')
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
 require('dotenv').config({ path: 'variables.env' });
+const fs = require('fs')
+const path = require('path')
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors')
+
+const PORT = process.env.PORT || 4444;
+
+const { ApolloServer } = require('apollo-server-express')
+const filePath = path.join(__dirname, "typeDefs.gql");
+const typeDefs = fs.readFileSync(filePath, 'utf-8');
+const resolvers = require('./resolvers')
 
 const Recipe = require('./models/Recipe');
 const User = require("./models/User");
 
-//Bring in graphql express middleware
-const { graphiqlExpress, graphqlExpress } = require('apollo-server-express')
-const { makeExecutableSchema } = require('graphql-tools')
-
-const { typeDefs } = require('./schema')
-const { resolvers } = require('./resolvers')
-
-
-const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers
-})
-
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/react-apollo-recipes";
-
-// connects to database
-
-mongoose.connect(MONGODB_URI, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useFindAndModify: false
-})
-    .then(() => console.log("DB connected"))
-    .catch(err => console.error(err))
-
-
-// Initalizes application
+const connectDb = require('./utils/connectDb');
 
 const app = express();
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: { Recipe, User }
+})
 
-// create graphiql application
-app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }
+connectDb()
 
-))
+// Initalizes application
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true
+}
 
-//connect schemas with graphql
-app.use('/graphql', graphqlExpress({
-    schema,
-    context: {
-        Recipe,
-        User
-    }
-}))
+server.applyMiddleware({ app, cors: corsOptions })
 
-const PORT = process.env.PORT || 4444;
-
-app.listen(PORT, () => {
-    console.log(`server listening on ${PORT}`)
+app.listen({ port: PORT }, () => {
+    console.log(`server listening on ${server.graphqlPath} ${PORT}`)
 })

@@ -1,16 +1,16 @@
 require('dotenv').config({ path: 'variables.env' });
-const fs = require('fs')
-const path = require('path')
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors')
+// const bodyParser = require('body-parser');
+// const cors = require('cors')
 
 const PORT = process.env.PORT || 4444;
 
-const { ApolloServer } = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server-express');
 const filePath = path.join(__dirname, "typeDefs.gql");
 const typeDefs = fs.readFileSync(filePath, 'utf-8');
-const resolvers = require('./resolvers')
+const resolvers = require('./resolvers');
 
 const Recipe = require('./models/Recipe');
 const User = require("./models/User");
@@ -24,7 +24,7 @@ const server = new ApolloServer({
     context: { Recipe, User }
 })
 
-connectDb()
+connectDb();
 
 // Initalizes application
 const corsOptions = {
@@ -32,8 +32,8 @@ const corsOptions = {
     credentials: true
 }
 
-server.applyMiddleware({ app, cors: corsOptions })
+server.applyMiddleware({ app, cors: corsOptions });
 
 app.listen({ port: PORT }, () => {
     console.log(`server listening on ${server.graphqlPath} ${PORT}`)
-})
+});

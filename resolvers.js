@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { AuthenticationError } = require('apollo-server-express')
 
 const createToken = (user, secret, expiresIn) => {
     const { username, email } = user;
@@ -25,14 +26,14 @@ module.exports = {
                 instructions,
                 username
             }).save();
-            console.log(newRecipe)
             return newRecipe;
         },
 
         signupUser: async (root, { username, email, password }, { User }) => {
             const user = await User.findOne({ username })
             if (user) {
-                throw new Error('User already exists')
+                // throw new Error('User already exists')
+                throw new AuthenticationError('User already exists')
             }
             const newUser = await new User({
                 username,

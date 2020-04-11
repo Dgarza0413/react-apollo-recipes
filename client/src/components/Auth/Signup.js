@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import { Mutation } from 'react-apollo'
 import { SIGNUP_USER } from '../../queries/index'
+import Error from '../Utils/Error'
 
 const Signup = () => {
-    const [signup, setSignup] = useState({
+    const [initialState] = useState({
         username: '',
         email: '',
         password: '',
         passwordConfirmation: ''
+    })
+
+    const [signup, setSignup] = useState({
+        ...initialState
     })
 
     const handleChange = (e) => {
@@ -20,12 +25,24 @@ const Signup = () => {
         })
     }
 
+    const clearState = () => {
+        setSignup({ ...initialState })
+    }
+
     const handleSubmit = (e, signupUser) => {
         e.preventDefault();
-        signupUser().then(data => {
-            console.log(data)
-        })
+        signupUser()
+            .then(data => {
+                console.log(data)
+                clearState()
+            })
+            .catch(err => console.error(err))
+    }
 
+    const validateForm = () => {
+        const { username, email, password, passwordConfirmation } = signup
+        const isInvalid = !username || !email || !password || password !== passwordConfirmation
+        return isInvalid
     }
 
     return (
@@ -67,9 +84,11 @@ const Signup = () => {
                                 onChange={handleChange}
                             />
                             <button
+                                disabled={loading || validateForm()}
                                 type="submit"
                                 className="button-primary"
                             >Submit</button>
+                            {error && <Error error={error.message} />}
                         </form>
                     )
                 }}

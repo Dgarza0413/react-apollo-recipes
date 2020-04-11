@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const { AuthenticationError } = require('apollo-server-express')
+const { AuthenticationError } = require('apollo-server-express');
+const bcrypt = require('bcrypt');
 
 const createToken = (user, secret, expiresIn) => {
     const { username, email } = user;
@@ -29,6 +30,19 @@ module.exports = {
             return newRecipe;
         },
 
+        signinUser: async (root, { username, password }, { User }) => {
+            const user = await User.findOne({ username });
+            if (!user) {
+                throw new AuthenticationError('User not found');
+            }
+            const isValidPassword = await bcrypt.compare(password, user.password);
+            if (!isValidPassword) {
+                throw new AuthenticationError('Invalid Password');
+            }
+            return { token: createToken(user, process.env.SECRET, '1hr') };
+
+        },
+
         signupUser: async (root, { username, email, password }, { User }) => {
             const user = await User.findOne({ username })
             if (user) {
@@ -42,5 +56,7 @@ module.exports = {
             }).save();
             return { token: createToken(newUser, process.env.SECRET, '1hr') };
         }
+
+
     }
 }

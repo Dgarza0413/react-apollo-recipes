@@ -40,4 +40,9 @@ type Mutation {
         email: String!, 
         password: String!
         ): Token
+
+    signinUser(
+        username: String!,
+        password: String!
+        ): Token
 }

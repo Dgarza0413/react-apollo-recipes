@@ -2,20 +2,27 @@ const jwt = require('jsonwebtoken');
 const { AuthenticationError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 
+const User = require('./models/User');
+const Recipe = require('./models/Recipe');
+
 const createToken = (user, secret, expiresIn) => {
     const { username, email } = user;
     return jwt.sign({ username, email }, secret, { expiresIn })
 }
 
 module.exports = {
+
     Query: {
         getAllRecipes: async (root, args, { Recipe }) => {
+            // getAllRecipes: async (root, args) => {
             const allRecipes = await Recipe.find();
+            console.log(allRecipes)
             return allRecipes;
         },
     },
     Mutation: {
         // take a (root, args, context) parameters
+        // if you decide to place this in context then it must reflect to the server
         addRecipe: async (
             root,
             { name, description, category, instructions, username },
@@ -31,6 +38,7 @@ module.exports = {
         },
 
         signinUser: async (root, { username, password }, { User }) => {
+            // signinUser: async (root, { username, password }) => {
             const user = await User.findOne({ username });
             if (!user) {
                 throw new AuthenticationError('User not found');
@@ -44,6 +52,7 @@ module.exports = {
         },
 
         signupUser: async (root, { username, email, password }, { User }) => {
+            // signupUser: async (root, { username, email, password }) => {
             const user = await User.findOne({ username })
             if (user) {
                 // throw new Error('User already exists')

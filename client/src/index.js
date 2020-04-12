@@ -7,13 +7,35 @@ import App from './App';
 import Signup from './components/Auth/Signup'
 import Signin from './components/Auth/Signin'
 
-import ApolloClient from 'apollo-boost'
+import ApolloClient, { InMemoryCache } from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 
 import './index.css';
 
+const cache = new InMemoryCache();
 const client = new ApolloClient({
-  uri: 'http://localhost:4444/graphql'
+  uri: 'http://localhost:4444/graphql' || '',
+  fetchOptions: {
+    credentials: 'include'
+  },
+  cache,
+  request: operation => {
+    const token = localStorage.getItem('token');
+    operation.setContext({
+      headers: {
+        authorization: token
+      }
+    })
+  },
+  onError: ({ networkError }) => {
+    if (networkError) {
+      console.log("NetWork Error", networkError)
+
+      if (networkError.statusCode === 401) {
+        localStorage.removeItem('token')
+      }
+    }
+  }
 })
 
 const Root = () => {

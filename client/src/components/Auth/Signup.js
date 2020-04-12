@@ -34,6 +34,7 @@ const Signup = () => {
         signupUser()
             .then(data => {
                 console.log(data)
+                localStorage.setItem('token', data.signupUser.token)
                 clearState()
             })
             .catch(err => console.error(err))

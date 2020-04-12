@@ -30,7 +30,8 @@ const Signin = () => {
     const handleSubmit = (e, signinUser) => {
         e.preventDefault();
         signinUser()
-            .then(data => {
+            .then(({ data }) => {
+                localStorage.setItem('token', data.signinUser.token)
                 console.log(data)
                 clearState()
             })

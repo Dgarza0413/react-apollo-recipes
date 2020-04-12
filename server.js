@@ -2,8 +2,7 @@ require('dotenv').config({ path: 'variables.env' });
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-// const bodyParser = require('body-parser');
-// const cors = require('cors')
+const jwt = require('jsonwebtoken')
 
 const PORT = process.env.PORT || 4444;
 
@@ -21,18 +20,37 @@ const app = express();
 const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: { Recipe, User }
+    // context: { Recipe, User }
+    context: async ({ req }) => ({
+        Recipe: Recipe,
+        User: User,
+    })
 })
 
 connectDb();
 
-// Initalizes application
-const corsOptions = {
-    origin: 'http://localhost:3000',
-    credentials: true
-}
+// set up jwt authentication middleware
 
-server.applyMiddleware({ app, cors: corsOptions });
+app.use(async (req, res, next) => {
+    const token = await req.headers['authorization'] || '';
+    if (token !== 'null') {
+        try {
+            const currentUser = await jwt.verify(token, process.env.SECRET)
+            console.log(currentUser)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    next();
+});
+
+server.applyMiddleware({
+    app, cors: {
+        origin: 'http://localhost:3000',
+        credentials: true
+    }
+});
+
 
 app.listen({ port: PORT }, () => {
     console.log(`server listening on ${server.graphqlPath} ${PORT}`)

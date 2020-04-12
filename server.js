@@ -24,6 +24,7 @@ const server = new ApolloServer({
     context: async ({ req }) => ({
         Recipe: Recipe,
         User: User,
+        currentUser: req.currentUser
     })
 })
 
@@ -36,7 +37,7 @@ app.use(async (req, res, next) => {
     if (token !== 'null') {
         try {
             const currentUser = await jwt.verify(token, process.env.SECRET)
-            console.log(currentUser)
+            req.currentUser = currentUser
         } catch (error) {
             console.error(error)
         }

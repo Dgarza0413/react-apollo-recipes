@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import App from './App';
 import Signup from './components/Auth/Signup'
 import Signin from './components/Auth/Signin'
+import withSession from './components/withSession'
 
 import ApolloClient, { InMemoryCache } from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
@@ -51,10 +52,13 @@ const Root = () => {
   )
 }
 
+const RootWithSession = withSession(Root)
+
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <Root />
+      {/* <Root /> */}
+      <RootWithSession />
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById('root')

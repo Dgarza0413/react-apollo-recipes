@@ -2,9 +2,6 @@ const jwt = require('jsonwebtoken');
 const { AuthenticationError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 
-const User = require('./models/User');
-const Recipe = require('./models/Recipe');
-
 const createToken = (user, secret, expiresIn) => {
     const { username, email } = user;
     return jwt.sign({ username, email }, secret, { expiresIn })
@@ -14,12 +11,12 @@ module.exports = {
 
     Query: {
         getAllRecipes: async (root, args, { Recipe }) => {
-            // getAllRecipes: async (root, args) => {
             const allRecipes = await Recipe.find();
-            console.log(allRecipes)
             return allRecipes;
         },
         getCurrentUser: async (root, args, { currentUser, User }) => {
+            console.log(currentUser)
+            console.log(User)
             if (!currentUser) {
                 return null;
             }

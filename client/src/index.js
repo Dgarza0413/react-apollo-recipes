@@ -36,7 +36,12 @@ const client = new ApolloClient({
         localStorage.removeItem('token')
       }
     }
-  }
+  },
+  // onSuccess: ({ networkSuccess }) => {
+  //   if (networkSuccess) {
+  //     console.log("NetWork Success", networkSuccess)
+  //   }
+  // }
 })
 
 const Root = () => {

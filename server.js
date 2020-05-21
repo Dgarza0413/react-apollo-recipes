@@ -17,33 +17,51 @@ const User = require("./models/User");
 const connectDb = require('./utils/connectDb');
 
 const app = express();
+
+const getUser = async token => {
+    if (token) {
+        try {
+            return await jwt.verify(token, process.env.SECRET);
+        } catch (err) {
+            throw new AuthenticationError(
+                "Your session has ended. Please sign in again"
+            );
+        }
+    }
+};
+
 const server = new ApolloServer({
     typeDefs,
     resolvers,
     // context: { Recipe, User }
-    context: async ({ req }) => ({
-        Recipe: Recipe,
-        User: User,
-        currentUser: req.currentUser
-    })
+    context: async ({ req }) => {
+        const token = req.headers["authorization"];
+        console.log(token)
+        return {
+            Recipe,
+            User,
+            currentUser: await getUser(token)
+        }
+    }
 })
 
 connectDb();
 
 // set up jwt authentication middleware
 
-app.use(async (req, res, next) => {
-    const token = await req.headers['authorization'] || '';
-    if (token !== 'null') {
-        try {
-            const currentUser = await jwt.verify(token, process.env.SECRET)
-            req.currentUser = currentUser
-        } catch (error) {
-            console.error(error)
-        }
-    }
-    next();
-});
+// app.use(async (req, res, next) => {
+// const token = await req.headers['authorization'] || '';
+// console.log(token)
+// if (token !== 'null') {
+//     try {
+//         // const currentUser = await jwt.verify(token, process.env.SECRET)
+//         // req.currentUser = currentUser
+//     } catch (error) {
+//         console.error(error)
+//     }
+// }
+// next();
+// });
 
 server.applyMiddleware({
     app, cors: {
@@ -54,5 +72,5 @@ server.applyMiddleware({
 
 
 app.listen({ port: PORT }, () => {
-    console.log(`server listening on ${server.graphqlPath} ${PORT}`)
+    console.log(`server listening on ${server.graphqlPath}  ${PORT}`)
 });

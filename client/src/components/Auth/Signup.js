@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { Mutation } from 'react-apollo'
-import { SIGNUP_USER } from '../../queries/index'
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
+import { Mutation } from 'react-apollo';
+import { SIGNUP_USER } from '../../queries/index';
 import Error from '../Utils/Error'
 
-const Signup = () => {
+const Signup = (props) => {
     const [initialState] = useState({
         username: '',
         email: '',
@@ -32,10 +33,12 @@ const Signup = () => {
     const handleSubmit = (e, signupUser) => {
         e.preventDefault();
         signupUser()
-            .then(data => {
+            .then(async ({ data }) => {
                 console.log(data)
                 localStorage.setItem('token', data.signupUser.token)
+                await props.refetch();
                 clearState()
+                props.history.push('/')
             })
             .catch(err => console.error(err))
     }
@@ -98,4 +101,4 @@ const Signup = () => {
     )
 }
 
-export default Signup
+export default withRouter(Signup)

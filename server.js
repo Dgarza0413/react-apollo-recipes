@@ -33,16 +33,20 @@ const getUser = async token => {
 const server = new ApolloServer({
     typeDefs,
     resolvers,
-    // context: { Recipe, User }
-    context: async ({ req }) => {
-        const token = req.headers["authorization"];
-        console.log(token)
-        return {
-            Recipe,
-            User,
-            currentUser: await getUser(token)
-        }
-    }
+    context: { Recipe, User }
+    // context: async ({ req }) => {
+    //     const token = req.headers["authorization"];
+    //     console.log(token)
+    //     if (token) {
+    //         return {
+    //             Recipe,
+    //             User,
+    //             currentUser: await getUser(token)
+    //         }
+    //     } else {
+    //         return console.log('no token')
+    //     }
+    // }
 })
 
 connectDb();

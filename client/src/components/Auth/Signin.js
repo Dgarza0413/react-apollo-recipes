@@ -4,7 +4,11 @@ import { Mutation } from 'react-apollo'
 import { SIGNIN_USER } from '../../queries/index'
 import Error from '../Utils/Error'
 
-const Signin = () => {
+const Signin = (props) => {
+    console.log(props)
+    // const { refetch, history } = props;
+    // console.log(refetch)
+    // console.log(history)
     const [initialState] = useState({
         username: '',
         password: '',
@@ -29,12 +33,15 @@ const Signin = () => {
     }
 
     const handleSubmit = (e, signinUser) => {
+        console.log(props)
         e.preventDefault();
         signinUser()
             .then(({ data }) => {
                 localStorage.setItem('token', data.signinUser.token)
+                // await props.refetch();
                 console.log(data)
                 clearState()
+                props.history.push('/')
             })
             .catch(err => console.error(err))
     }
@@ -83,4 +90,4 @@ const Signin = () => {
     )
 }
 
-export default Signin
+export default withRouter(Signin)

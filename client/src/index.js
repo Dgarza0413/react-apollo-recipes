@@ -9,6 +9,8 @@ import Signin from './components/Auth/Signin'
 import withSession from './components/withSession'
 import Navbar from './components/Navbar';
 import Search from './components/Recipe/Search';
+import AddRecipe from './components/Recipe/AddRecipe';
+import Profile from './components/Recipe/Profile';
 
 import ApolloClient, { InMemoryCache } from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
@@ -57,6 +59,8 @@ const Root = (props, { refetch }) => {
           <Route path="/search" component={Search} />
           <Route path="/signin" render={() => <Signin {...props} refetch={refetch} />} />
           <Route path="/signup" render={() => <Signup {...props} refetch={refetch} />} />
+          <Route path="/recipe/add" component={AddRecipe} />
+          <Route path="/profile" component={Profile} />
           <Redirect to="/" />
         </Switch>
       </>
